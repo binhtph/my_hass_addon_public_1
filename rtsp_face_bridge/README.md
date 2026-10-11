@@ -14,6 +14,7 @@ Home Assistant local add-on lấy trực tiếp các entity `camera.*` đã có 
 - Một người có tối đa `100` ảnh mẫu; hỗ trợ thêm ảnh, xóa từng ảnh, đổi tên và retrain nền.
 - Cache embedding trong RAM/đĩa để khởi động và retrain nhanh hơn, phù hợp máy có `16 GB RAM`.
 - Quản lý/tải/kích hoạt `buffalo_sc`, `buffalo_s` và `buffalo_l` ngay trong Web UI.
+- Chọn bộ nhận diện khuôn mặt: `SCRFD` (mặc định) hoặc `YuNet 320/416/480` để chạy nhanh gấp ~2 lần, nhẹ CPU/RAM hơn.
 - Ghi SQLite, encode ảnh và publish MQTT qua hàng đợi nền để không chặn camera worker.
 - MQTT Discovery tự tạo camera, binary sensor và sensor.
 - Dashboard polling nhẹ mỗi `3 giây`, tự thêm event mới và cập nhật trạng thái camera/AI/MQTT mà không reload trang.
@@ -47,6 +48,16 @@ Vào **Cài đặt → Preset hiệu năng → NUC6CAYH tiết kiệm**. Preset 
 - OpenCV `1` thread và Web UI `4` worker.
 
 RAM `16 GB` đủ rộng cho model, cache embedding và lịch sử; CPU J3455 vẫn là giới hạn chính nên không nên dùng detector `1280` trừ khi thật sự cần mặt rất xa.
+
+## Chế độ nhận diện siêu nhanh (YuNet)
+
+Vào **Cài đặt → CPU và chuyển động → Bộ nhận diện khuôn mặt** và chọn `YuNet 320`. Detector YuNet (`face_detection_yunet_2023mar.onnx`, ~232 KB) đã có sẵn trong addon, không cần tải thêm.
+
+- Giữ nguyên model nhận diện `buffalo_sc` nên thư viện người đã thêm vẫn dùng được, không phải thêm ảnh lại.
+- Trên NUC6CAYH (2 CPU thread, frame 960 px) đo được: `SCRFD 640` ~51 ms/khung, `YuNet 320` ~26 ms/khung (~2 lần nhanh hơn), RAM thấp hơn.
+- Chọn `YuNet 416` hoặc `YuNet 480` nếu cần nhận mặt ở xa hơn; vẫn nhanh hơn SCRFD 640.
+- Preset **NUC6CAYH siêu nhanh** áp dụng sẵn `YuNet 320` + `buffalo_sc` + `1 FPS`.
+- Muốn quay lại hành vi cũ, chọn `SCRFD (InsightFace)`.
 
 ## Quản lý Face ID
 
